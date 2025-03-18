@@ -41,11 +41,12 @@ const Game: React.FC = () => {
     spawnEnemy,
     updateEnemies,
     removeEnemy,
+    gameOver,
   } = useStore();
 
-  // One-time initialization
-  useEffect(() => {
-    console.log("Game component mounted");
+  // Function to spawn initial enemies
+  const spawnInitialEnemies = useCallback(() => {
+    console.log("Spawning initial enemies");
     try {
       // Spawn initial enemies
       for (let i = 0; i < 3; i++) {
@@ -62,12 +63,28 @@ const Game: React.FC = () => {
     } catch (error) {
       console.error("Error spawning initial enemies:", error);
     }
+  }, [spawnEnemy]);
+
+  // One-time initialization
+  useEffect(() => {
+    console.log("Game component mounted");
+    if (enemies.length === 0) {
+      spawnInitialEnemies();
+    }
 
     // Cleanup on unmount
     return () => {
       console.log("Game component unmounting");
     };
-  }, [spawnEnemy]);
+  }, [spawnEnemy, enemies.length, spawnInitialEnemies]);
+
+  // Watch for game reset
+  useEffect(() => {
+    // When gameOver changes from true to false, respawn enemies
+    if (!gameOver && enemies.length === 0) {
+      spawnInitialEnemies();
+    }
+  }, [gameOver, enemies.length, spawnInitialEnemies]);
 
   // Keep track of previous enemies to detect destroyed ones
   const prevEnemiesRef = React.useRef<Enemy[]>([]);
@@ -101,6 +118,9 @@ const Game: React.FC = () => {
   // Game update logic
   useFrame((_, delta) => {
     try {
+      // Don't update game state when game is over
+      if (gameOver) return;
+
       // Update game state
       updateBullets(delta);
       updateEnemies(delta, playerPosition);

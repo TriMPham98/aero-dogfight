@@ -54,6 +54,7 @@ interface GameState {
   playerRotation: Rotation;
   health: number;
   score: number;
+  gameOver: boolean;
 
   // Game objects
   bullets: Bullet[];
@@ -72,6 +73,7 @@ interface GameState {
 
   increaseScore: (amount: number) => void;
   decreaseHealth: (amount: number) => void;
+  resetGame: () => void;
 }
 
 // Utility functions
@@ -90,6 +92,7 @@ const useStore = create<GameState>(
     playerRotation: { x: 0, y: 0, z: 0 },
     health: 100,
     score: 0,
+    gameOver: false,
 
     // Initial game objects
     bullets: [],
@@ -134,6 +137,7 @@ const useStore = create<GameState>(
           const bullets = [...updatedBullets];
           const enemies = [...state.enemies];
           let score = state.score;
+          let health = state.health;
 
           // Track bullets to remove after collisions
           const bulletsToRemove = new Set<string>();
@@ -142,7 +146,26 @@ const useStore = create<GameState>(
           for (let i = 0; i < bullets.length; i++) {
             const bullet = bullets[i];
 
-            // Skip non-player bullets
+            // Check enemy bullets hitting player
+            if (bullet.ownerId === "enemy") {
+              const playerPosition = state.playerPosition;
+              const distance = distanceBetween(bullet.position, playerPosition);
+
+              // If bullet is close enough to player, damage player
+              if (distance < 2 && !bulletsToRemove.has(bullet.id)) {
+                // Mark bullet for removal
+                bulletsToRemove.add(bullet.id);
+
+                // Damage player
+                health -= 10;
+                console.log(`Player hit by enemy bullet, health: ${health}`);
+
+                // Continue to next bullet
+                continue;
+              }
+            }
+
+            // Skip non-player bullets for enemy damage
             if (bullet.ownerId !== "player") continue;
 
             for (let j = 0; j < enemies.length; j++) {
@@ -198,6 +221,7 @@ const useStore = create<GameState>(
             bullets: filteredBullets,
             enemies,
             score,
+            health,
           };
         } catch (error) {
           console.error("Error in updateBullets:", error);
@@ -297,6 +321,12 @@ const useStore = create<GameState>(
             health = 0;
           }
 
+          // Set game over if health is zero
+          let gameOver = state.gameOver;
+          if (health <= 0) {
+            gameOver = true;
+          }
+
           // Respawn enemies if there are too few
           let updatedEnemiesList = [...updatedEnemies];
 
@@ -317,7 +347,7 @@ const useStore = create<GameState>(
             });
           }
 
-          return { enemies: updatedEnemiesList, health };
+          return { enemies: updatedEnemiesList, health, gameOver };
         } catch (error) {
           console.error("Error in updateEnemies:", error);
           return state;
@@ -329,6 +359,16 @@ const useStore = create<GameState>(
       set((state) => ({ score: state.score + amount })),
     decreaseHealth: (amount) =>
       set((state) => ({ health: state.health - amount })),
+    resetGame: () =>
+      set((state) => ({
+        playerPosition: { x: 0, y: 5, z: 0 },
+        playerRotation: { x: 0, y: 0, z: 0 },
+        health: 100,
+        score: 0,
+        gameOver: false,
+        bullets: [],
+        enemies: [],
+      })),
   }))
 );
 
