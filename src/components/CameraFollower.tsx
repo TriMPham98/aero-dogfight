@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Vector3, Euler, Quaternion, Matrix4 } from "three";
 import useStore from "../store/store";
-import Bullseye from "./Bullseye";
 
 const CameraFollower: React.FC = () => {
   const { camera } = useThree();
@@ -59,7 +58,7 @@ const CameraFollower: React.FC = () => {
     );
 
     // Smooth camera movement
-    const positionSmoothness = 0.1; // Higher value for more responsive movement
+    const positionSmoothness = 0.1;
     cameraPositionRef.current.lerp(cameraPosition, positionSmoothness);
     camera.position.copy(cameraPositionRef.current);
 
@@ -78,7 +77,7 @@ const CameraFollower: React.FC = () => {
     camera.up.copy(trueUpVector);
   });
 
-  return <Bullseye />; // Render the bullseye component
+  return null;
 };
 
 export default CameraFollower;

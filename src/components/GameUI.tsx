@@ -15,54 +15,22 @@ const GameUI: React.FC = () => {
         color: "white",
         fontFamily: "Arial, sans-serif",
         pointerEvents: "none",
+        textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
       }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
+          width: "100%",
+          maxWidth: "calc(100% - 40px)",
         }}>
         <div>
           <p style={{ margin: 0, fontSize: "1.5rem" }}>Score: {score}</p>
         </div>
         <div>
-          <p style={{ margin: 0, fontSize: "1.5rem" }}>Health: {health}</p>
-        </div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-        }}>
-        <div
-          style={{
-            width: "10px",
-            height: "10px",
-            border: "2px solid white",
-            borderRadius: "50%",
-            position: "relative",
-          }}>
-          <div
-            style={{
-              position: "absolute",
-              width: "20px",
-              height: "2px",
-              backgroundColor: "white",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}></div>
-          <div
-            style={{
-              position: "absolute",
-              width: "2px",
-              height: "20px",
-              backgroundColor: "white",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}></div>
+          <p style={{ margin: 0, fontSize: "1.5rem", paddingRight: "20px" }}>
+            Health: {health}
+          </p>
         </div>
       </div>
       <div
@@ -73,8 +41,11 @@ const GameUI: React.FC = () => {
           transform: "translateX(-50%)",
           fontSize: "1rem",
           textAlign: "center",
+          backgroundColor: "rgba(0,0,0,0.3)",
+          padding: "8px 16px",
+          borderRadius: "4px",
         }}>
-        <p>Arrow keys to control | Space to shoot</p>
+        <p style={{ margin: 0 }}>Arrow keys to control | Space to shoot</p>
       </div>
     </div>
   );
