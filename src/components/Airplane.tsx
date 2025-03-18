@@ -39,41 +39,36 @@ const Airplane: React.FC<AirplaneProps> = ({
 
     // Apply rotation based on input
     const rotationSpeed = 1.5;
-    const currentRotation = new Euler(
-      mesh.current.rotation.x,
-      mesh.current.rotation.y,
-      mesh.current.rotation.z
-    );
 
+    // Create a quaternion from the current rotation
+    const currentRotation = mesh.current.rotation.clone();
+
+    // Create rotation vectors based on aircraft's local axes
+    const localRight = new Vector3(1, 0, 0).applyEuler(currentRotation);
+    const localUp = new Vector3(0, 1, 0).applyEuler(currentRotation);
+
+    // Apply roll (around local Z axis, which is forward)
     if (controlInput.left) {
-      currentRotation.z += rotationSpeed * delta;
-      currentRotation.y -= rotationSpeed * delta * 0.5;
+      mesh.current.rotateOnAxis(new Vector3(0, 0, 1), rotationSpeed * delta);
     }
 
     if (controlInput.right) {
-      currentRotation.z -= rotationSpeed * delta;
-      currentRotation.y += rotationSpeed * delta * 0.5;
+      mesh.current.rotateOnAxis(new Vector3(0, 0, 1), -rotationSpeed * delta);
     }
 
+    // Apply pitch (around local X axis, which is right wing)
     if (controlInput.up) {
-      currentRotation.x -= rotationSpeed * delta;
+      mesh.current.rotateOnAxis(new Vector3(1, 0, 0), -rotationSpeed * delta);
     }
 
     if (controlInput.down) {
-      currentRotation.x += rotationSpeed * delta;
+      mesh.current.rotateOnAxis(new Vector3(1, 0, 0), rotationSpeed * delta);
     }
-
-    // Apply the new rotation
-    mesh.current.rotation.set(
-      currentRotation.x,
-      currentRotation.y,
-      currentRotation.z
-    );
 
     // Move forward in the direction the plane is facing
     const speed = 10;
     const direction = new Vector3(0, 0, -1);
-    direction.applyEuler(currentRotation);
+    direction.applyEuler(mesh.current.rotation);
     direction.multiplyScalar(speed * delta);
 
     mesh.current.position.add(direction);
@@ -93,7 +88,9 @@ const Airplane: React.FC<AirplaneProps> = ({
 
     // Shooting
     if (controlInput.shoot && isPlayer) {
-      const bulletDirection = new Vector3(0, 0, -1).applyEuler(currentRotation);
+      const bulletDirection = new Vector3(0, 0, -1).applyEuler(
+        mesh.current.rotation
+      );
 
       spawnBullet({
         position: {
