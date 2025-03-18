@@ -31,8 +31,14 @@ const Game: React.FC = () => {
   useEffect(() => {
     // Spawn initial enemies
     for (let i = 0; i < 3; i++) {
-      const x = Math.random() * 50 - 25;
-      const z = Math.random() * 50 - 25;
+      // Create enemies at different angles around the player
+      const angle = (i * Math.PI * 2) / 3; // Divide circle into 3 parts
+      const distance = 30; // Start enemies further away
+
+      const x = Math.cos(angle) * distance;
+      const z = Math.sin(angle) * distance;
+
+      console.log(`Spawning enemy at: x=${x}, z=${z}`);
       spawnEnemy({ x, y: 5, z });
     }
   }, [spawnEnemy]);
@@ -44,6 +50,12 @@ const Game: React.FC = () => {
     // Update game state
     updateBullets(delta);
     updateEnemies(delta, playerPosition);
+
+    // Debug enemy positions (can be removed later)
+    if (enemies.length > 0) {
+      console.log(`Player: ${JSON.stringify(playerPosition)}`);
+      console.log(`Enemy 0: ${JSON.stringify(enemies[0].position)}`);
+    }
 
     // Check for destroyed enemies to create explosions
     const prevEnemies = prevEnemiesRef.current;

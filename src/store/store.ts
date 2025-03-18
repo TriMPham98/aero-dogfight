@@ -185,12 +185,16 @@ const useStore = create<GameState>((set, get) => ({
           directionToPlayer.z /= length;
         }
 
-        // Move enemy toward player
+        // Move enemy toward player - fixing the movement by ensuring delta is a number
         const speed = 3;
+        // Make sure delta is a valid number, use a default value if it's not
+        const safetyDelta =
+          typeof delta === "number" && !isNaN(delta) ? delta : 0.016;
+
         const newPosition = {
-          x: enemy.position.x + directionToPlayer.x * speed * delta,
-          y: enemy.position.y + directionToPlayer.y * speed * delta,
-          z: enemy.position.z + directionToPlayer.z * speed * delta,
+          x: enemy.position.x + directionToPlayer.x * speed * safetyDelta,
+          y: enemy.position.y + directionToPlayer.y * speed * safetyDelta,
+          z: enemy.position.z + directionToPlayer.z * speed * safetyDelta,
         };
 
         // Update enemy rotation to face player
@@ -220,11 +224,18 @@ const useStore = create<GameState>((set, get) => ({
       });
 
       // Respawn enemies if there are too few
-      if (updatedEnemies.length < 3) {
-        const x = Math.random() * 50 - 25 + playerPosition.x;
-        const z = Math.random() * 50 - 25 + playerPosition.z;
+      let updatedEnemiesList = [...updatedEnemies];
 
-        updatedEnemies.push({
+      if (updatedEnemiesList.length < 3) {
+        // Add a sufficient distance from the player to make them spawn outside the visible area
+        const spawnDistance = 30;
+        const angle = Math.random() * Math.PI * 2; // Random angle around player
+
+        // Use polar coordinates to position enemies around the player
+        const x = playerPosition.x + Math.cos(angle) * spawnDistance;
+        const z = playerPosition.z + Math.sin(angle) * spawnDistance;
+
+        updatedEnemiesList.push({
           id: uuidv4(),
           position: { x, y: playerPosition.y, z },
           rotation: { x: 0, y: 0, z: 0 },
@@ -232,7 +243,7 @@ const useStore = create<GameState>((set, get) => ({
         });
       }
 
-      return { enemies: updatedEnemies, health };
+      return { enemies: updatedEnemiesList, health };
     });
   },
 

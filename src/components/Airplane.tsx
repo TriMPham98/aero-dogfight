@@ -24,16 +24,24 @@ const Airplane: React.FC<AirplaneProps> = ({
     useStore();
 
   useEffect(() => {
-    if (!groupRef.current || !isPlayer) return;
+    if (!groupRef.current) return;
 
-    // Set initial position and rotation for the plane
+    // Set initial position and rotation for any plane (player or enemy)
     groupRef.current.position.set(position.x, position.y, position.z);
     groupRef.current.rotation.set(rotation.x, rotation.y, rotation.z);
-  }, [isPlayer, position, rotation]);
+  }, [position, rotation]);
 
   useFrame((_, delta) => {
-    if (!groupRef.current || !isPlayer) return;
+    if (!groupRef.current) return;
 
+    // For enemy planes, update their position and rotation from props
+    if (!isPlayer) {
+      groupRef.current.position.set(position.x, position.y, position.z);
+      groupRef.current.rotation.set(rotation.x, rotation.y, rotation.z);
+      return;
+    }
+
+    // Player plane logic below
     // Get control input and update player plane
     const controlInput = updateControls();
 
