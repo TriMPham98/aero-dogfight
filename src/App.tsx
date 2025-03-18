@@ -7,7 +7,7 @@ import GameUI from "./components/GameUI";
 function App() {
   return (
     <>
-      <Canvas shadows camera={{ position: [0, 20, 20], fov: 55 }}>
+      <Canvas shadows>
         <Sky sunPosition={[100, 10, 100]} />
         <Stars radius={300} depth={50} count={5000} factor={4} />
         <ambientLight intensity={0.3} />

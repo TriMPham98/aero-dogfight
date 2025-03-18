@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import Airplane from "./Airplane";
 import Ground from "./Ground";
 import Explosion from "./Explosion";
+import CameraFollower from "./CameraFollower";
 import useStore from "../store/store";
 
 interface ExplosionState {
@@ -69,6 +70,7 @@ const Game: React.FC = () => {
 
   return (
     <>
+      <CameraFollower />
       <Ground />
 
       {/* Player airplane */}
