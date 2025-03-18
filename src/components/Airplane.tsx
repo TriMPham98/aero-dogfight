@@ -88,15 +88,23 @@ const Airplane: React.FC<AirplaneProps> = ({
 
     // Shooting
     if (controlInput.shoot && isPlayer) {
-      const bulletDirection = new Vector3(0, 0, -1).applyEuler(
-        mesh.current.rotation
+      // Create forward vector for bullet direction
+      const bulletDirection = new Vector3(0, 0, -1);
+      bulletDirection.applyEuler(mesh.current.rotation);
+
+      // Add an offset to spawn bullets slightly in front of the aircraft
+      const bulletOffset = bulletDirection.clone().multiplyScalar(2);
+      const bulletPosition = new Vector3(
+        mesh.current.position.x + bulletOffset.x,
+        mesh.current.position.y + bulletOffset.y,
+        mesh.current.position.z + bulletOffset.z
       );
 
       spawnBullet({
         position: {
-          x: mesh.current.position.x,
-          y: mesh.current.position.y,
-          z: mesh.current.position.z,
+          x: bulletPosition.x,
+          y: bulletPosition.y,
+          z: bulletPosition.z,
         },
         velocity: {
           x: bulletDirection.x * 20,
