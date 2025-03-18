@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Vector3, Euler } from "three";
 import useStore from "../store/store";
+import Bullseye from "./Bullseye";
 
 const CameraFollower: React.FC = () => {
   const { camera } = useThree();
@@ -65,7 +66,7 @@ const CameraFollower: React.FC = () => {
     camera.lookAt(lookAtPoint);
   });
 
-  return null; // This component doesn't render anything
+  return <Bullseye />; // Render the bullseye component
 };
 
 export default CameraFollower;
