@@ -290,6 +290,13 @@ const useStore = create<GameState>(
             }
           });
 
+          // Check for ground collision - set health to zero if player hits the ground
+          const groundLevel = -1; // Ground Y position (based on Ground.tsx)
+          if (playerPosition.y <= groundLevel) {
+            console.log("Player collided with ground - health set to zero");
+            health = 0;
+          }
+
           // Respawn enemies if there are too few
           let updatedEnemiesList = [...updatedEnemies];
 

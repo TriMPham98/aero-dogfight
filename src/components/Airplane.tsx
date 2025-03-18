@@ -22,6 +22,7 @@ const Airplane: React.FC<AirplaneProps> = ({
   const { updateControls } = useKeyControls();
   const { setPlayerPosition, setPlayerRotation, spawnBullet, playerPosition } =
     useStore();
+  const lastShotTimeRef = useRef(0);
 
   useEffect(() => {
     if (!groupRef.current) return;
@@ -38,6 +39,46 @@ const Airplane: React.FC<AirplaneProps> = ({
     if (!isPlayer) {
       groupRef.current.position.set(position.x, position.y, position.z);
       groupRef.current.rotation.set(rotation.x, rotation.y, rotation.z);
+
+      // Enemy shooting logic - semi-auto pace
+      // Make enemies shoot every 2 seconds
+      const currentTime = Date.now();
+      if (currentTime - lastShotTimeRef.current > 2000) {
+        lastShotTimeRef.current = currentTime;
+
+        // Get direction toward player
+        const bulletDirection = new Vector3(
+          playerPosition.x - position.x,
+          playerPosition.y - position.y,
+          playerPosition.z - position.z
+        ).normalize();
+
+        // Offset bullet spawn position
+        const bulletOffset = 2.5;
+        const bulletPosition = new Vector3(
+          position.x + bulletDirection.x * bulletOffset,
+          position.y + bulletDirection.y * bulletOffset,
+          position.z + bulletDirection.z * bulletOffset
+        );
+
+        // Slower bullet speed for enemies
+        const bulletSpeed = 20;
+
+        spawnBullet({
+          position: {
+            x: bulletPosition.x,
+            y: bulletPosition.y,
+            z: bulletPosition.z,
+          },
+          velocity: {
+            x: bulletDirection.x * bulletSpeed,
+            y: bulletDirection.y * bulletSpeed,
+            z: bulletDirection.z * bulletSpeed,
+          },
+          ownerId: "enemy",
+        });
+      }
+
       return;
     }
 
