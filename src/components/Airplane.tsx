@@ -88,17 +88,21 @@ const Airplane: React.FC<AirplaneProps> = ({
 
     // Shooting
     if (controlInput.shoot && isPlayer) {
-      // Create forward vector for bullet direction
+      // Get exact forward direction matching camera and bullseye
       const bulletDirection = new Vector3(0, 0, -1);
       bulletDirection.applyEuler(mesh.current.rotation);
+      bulletDirection.normalize();
 
-      // Add an offset to spawn bullets slightly in front of the aircraft
-      const bulletOffset = bulletDirection.clone().multiplyScalar(2);
+      // Offset bullet spawn position to be in front of the aircraft
+      const bulletOffset = 2.5;
       const bulletPosition = new Vector3(
-        mesh.current.position.x + bulletOffset.x,
-        mesh.current.position.y + bulletOffset.y,
-        mesh.current.position.z + bulletOffset.z
+        mesh.current.position.x + bulletDirection.x * bulletOffset,
+        mesh.current.position.y + bulletDirection.y * bulletOffset,
+        mesh.current.position.z + bulletDirection.z * bulletOffset
       );
+
+      // Higher bullet speed for better visualization
+      const bulletSpeed = 40;
 
       spawnBullet({
         position: {
@@ -107,9 +111,9 @@ const Airplane: React.FC<AirplaneProps> = ({
           z: bulletPosition.z,
         },
         velocity: {
-          x: bulletDirection.x * 20,
-          y: bulletDirection.y * 20,
-          z: bulletDirection.z * 20,
+          x: bulletDirection.x * bulletSpeed,
+          y: bulletDirection.y * bulletSpeed,
+          z: bulletDirection.z * bulletSpeed,
         },
         ownerId: isPlayer ? "player" : "enemy",
       });

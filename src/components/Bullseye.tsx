@@ -9,7 +9,6 @@ const Bullseye: React.FC = () => {
   const centerDotRef = useRef<Mesh>(null);
   const { playerPosition, playerRotation } = useStore();
 
-  // Update the bullseye position to match the plane's aiming direction
   useFrame(({ camera }) => {
     if (
       !outerRingRef.current ||
@@ -19,59 +18,79 @@ const Bullseye: React.FC = () => {
     )
       return;
 
-    // Create a forward vector from the player's rotation
-    const forwardVector = new Vector3(0, 0, -1);
-    forwardVector.applyEuler(playerRotation);
+    // Create a forward vector directly from the player's orientation
+    const forward = new Vector3(0, 0, -1);
+    forward.applyEuler(playerRotation);
+    forward.normalize();
 
-    // Place the bullseye far ahead in the direction the plane is pointing
-    const distance = 20;
+    // Project the bullseye far ahead for visibility
+    const distance = 100;
+
+    // Position the bullseye exactly where the aircraft is pointing
     const targetPosition = new Vector3(
-      playerPosition.x + forwardVector.x * distance,
-      playerPosition.y + forwardVector.y * distance,
-      playerPosition.z + forwardVector.z * distance
+      playerPosition.x + forward.x * distance,
+      playerPosition.y + forward.y * distance,
+      playerPosition.z + forward.z * distance
     );
 
-    // Apply position to all bullseye elements
+    // Update all bullseye elements
     outerRingRef.current.position.copy(targetPosition);
     innerRingRef.current.position.copy(targetPosition);
     centerDotRef.current.position.copy(targetPosition);
 
-    // Make the bullseye face toward the camera (always visible)
+    // Make sure the bullseye is perpendicular to the forward direction
     outerRingRef.current.lookAt(camera.position);
     innerRingRef.current.lookAt(camera.position);
     centerDotRef.current.lookAt(camera.position);
+
+    // Fixed size for bullseye based on distance
+    const distanceToCamera = camera.position.distanceTo(targetPosition);
+    const scale = distanceToCamera * 0.03; // Larger scaling factor
+
+    outerRingRef.current.scale.set(scale, scale, scale);
+    innerRingRef.current.scale.set(scale, scale, scale);
+    centerDotRef.current.scale.set(scale, scale, scale);
   });
 
   return (
-    <>
+    <group renderOrder={999}>
       {/* Outer ring */}
-      <mesh ref={outerRingRef}>
-        <ringGeometry args={[0.15, 0.2, 32]} />
+      <mesh ref={outerRingRef} renderOrder={999}>
+        <ringGeometry args={[0.7, 0.9, 32]} />
         <meshBasicMaterial
           color="red"
           transparent
-          opacity={0.7}
+          opacity={0.9}
           depthTest={false}
+          depthWrite={false}
+          renderOrder={999}
         />
       </mesh>
 
       {/* Inner ring */}
-      <mesh ref={innerRingRef}>
-        <ringGeometry args={[0.05, 0.08, 32]} />
+      <mesh ref={innerRingRef} renderOrder={999}>
+        <ringGeometry args={[0.3, 0.5, 32]} />
         <meshBasicMaterial
           color="white"
           transparent
-          opacity={0.8}
+          opacity={0.9}
           depthTest={false}
+          depthWrite={false}
+          renderOrder={999}
         />
       </mesh>
 
       {/* Center dot */}
-      <mesh ref={centerDotRef}>
-        <circleGeometry args={[0.02, 32]} />
-        <meshBasicMaterial color="red" depthTest={false} />
+      <mesh ref={centerDotRef} renderOrder={999}>
+        <circleGeometry args={[0.2, 32]} />
+        <meshBasicMaterial
+          color="red"
+          depthTest={false}
+          depthWrite={false}
+          renderOrder={999}
+        />
       </mesh>
-    </>
+    </group>
   );
 };
 
