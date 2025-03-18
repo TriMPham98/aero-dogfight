@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import Airplane from "./Airplane";
 import Ground from "./Ground";
 import Explosion from "./Explosion";
+import PlayerExplosion from "./PlayerExplosion";
 import CameraFollower from "./CameraFollower";
 import useStore from "../store/store";
 
@@ -28,6 +29,10 @@ interface Enemy {
 const Game: React.FC = () => {
   const [explosions, setExplosions] = useState<ExplosionState[]>([]);
   const [lastExplosion, setLastExplosion] = useState<string | null>(null);
+  const [playerExploded, setPlayerExploded] = useState(false);
+  const [playerExplosionPos, setPlayerExplosionPos] = useState<Position | null>(
+    null
+  );
 
   const {
     playerPosition,
@@ -42,7 +47,32 @@ const Game: React.FC = () => {
     updateEnemies,
     removeEnemy,
     gameOver,
+    health,
   } = useStore();
+
+  // Monitor health for player explosion
+  useEffect(() => {
+    // If health is 0 and player hasn't exploded yet, trigger explosion
+    if (health <= 0 && !playerExploded && !playerExplosionPos) {
+      console.log("Player health zero - triggering explosion");
+      setPlayerExploded(true);
+      setPlayerExplosionPos({ ...playerPosition });
+    }
+  }, [health, playerExploded, playerPosition, playerExplosionPos]);
+
+  // Reset player explosion state when game is reset
+  useEffect(() => {
+    if (!gameOver && playerExploded) {
+      setPlayerExploded(false);
+      setPlayerExplosionPos(null);
+    }
+  }, [gameOver, playerExploded]);
+
+  // Function to handle when player explosion animation completes
+  const handlePlayerExplosionComplete = useCallback(() => {
+    console.log("Player explosion animation complete");
+    setPlayerExplosionPos(null);
+  }, []);
 
   // Function to spawn initial enemies
   const spawnInitialEnemies = useCallback(() => {
@@ -166,8 +196,22 @@ const Game: React.FC = () => {
       <CameraFollower />
       <Ground />
 
-      {/* Player airplane */}
-      <Airplane position={playerPosition} rotation={playerRotation} isPlayer />
+      {/* Player airplane - only show if not exploded */}
+      {!playerExploded && (
+        <Airplane
+          position={playerPosition}
+          rotation={playerRotation}
+          isPlayer
+        />
+      )}
+
+      {/* Player explosion */}
+      {playerExplosionPos && (
+        <PlayerExplosion
+          position={playerExplosionPos}
+          onComplete={handlePlayerExplosionComplete}
+        />
+      )}
 
       {/* Enemy airplanes */}
       {enemies.map((enemy) => (
@@ -189,7 +233,7 @@ const Game: React.FC = () => {
         </mesh>
       ))}
 
-      {/* Explosions */}
+      {/* Enemy Explosions */}
       {explosions.map((explosion) => (
         <Explosion
           key={explosion.id}

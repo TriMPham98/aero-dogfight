@@ -216,12 +216,19 @@ const useStore = create<GameState>(
             `Bullets: ${filteredBullets.length}, Enemies: ${enemies.length}, Score: ${score}`
           );
 
+          // Check if health is zero and update gameOver state
+          let gameOver = state.gameOver;
+          if (health <= 0) {
+            gameOver = true;
+          }
+
           // Return updated state
           return {
             bullets: filteredBullets,
             enemies,
             score,
             health,
+            gameOver,
           };
         } catch (error) {
           console.error("Error in updateBullets:", error);
@@ -308,9 +315,13 @@ const useStore = create<GameState>(
           updatedEnemies.forEach((enemy) => {
             const distance = distanceBetween(enemy.position, playerPosition);
 
-            // If enemy is very close to player, damage player
+            // If enemy is very close to player, end the game immediately
             if (distance < 2) {
-              health -= 0.5; // Slowly decrease health on collision
+              // Set health to zero for immediate game over on collision
+              health = 0;
+              console.log(
+                "Player collided with enemy plane - instant game over"
+              );
             }
           });
 
