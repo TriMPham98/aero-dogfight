@@ -239,17 +239,28 @@ const useStore = create<GameState>(
     },
 
     spawnEnemy: (position) => {
-      set((state) => ({
-        enemies: [
-          ...state.enemies,
-          {
-            id: uuidv4(),
-            position,
-            rotation: { x: 0, y: 0, z: 0 },
-            health: 100,
-          },
-        ],
-      }));
+      set((state) => {
+        // Get player position to calculate initial rotation
+        const playerPos = state.playerPosition;
+
+        // Calculate initial rotation to face player
+        const initialYaw = Math.atan2(
+          -(playerPos.x - position.x),
+          -(playerPos.z - position.z)
+        );
+
+        return {
+          enemies: [
+            ...state.enemies,
+            {
+              id: uuidv4(),
+              position,
+              rotation: { x: 0, y: initialYaw, z: 0 },
+              health: 100,
+            },
+          ],
+        };
+      });
     },
 
     removeEnemy: (id) => {
@@ -295,17 +306,62 @@ const useStore = create<GameState>(
               z: enemy.position.z + directionToPlayer.z * speed * safetyDelta,
             };
 
-            // Update enemy rotation to face player
-            const rotation = {
-              x: enemy.rotation.x,
-              y: Math.atan2(-directionToPlayer.x, -directionToPlayer.z),
-              z: enemy.rotation.z,
+            // Calculate target yaw angle to face player
+            const targetYaw = Math.atan2(
+              -directionToPlayer.x,
+              -directionToPlayer.z
+            );
+
+            // Calculate current direction vector from rotation
+            const currentDirection = {
+              x: Math.sin(-enemy.rotation.y),
+              y: 0,
+              z: Math.cos(-enemy.rotation.y),
+            };
+
+            // Calculate cross product to determine which way to roll
+            const crossProduct =
+              currentDirection.x * directionToPlayer.z -
+              currentDirection.z * directionToPlayer.x;
+
+            // Smoothly interpolate rotation values
+            const rotationSmoothness = 1.5 * safetyDelta;
+
+            // Calculate pitch based on vertical difference
+            const pitchTarget =
+              Math.atan2(
+                directionToPlayer.y,
+                Math.sqrt(
+                  directionToPlayer.x * directionToPlayer.x +
+                    directionToPlayer.z * directionToPlayer.z
+                )
+              ) * 0.5; // Scale down pitch for more natural movement
+
+            // Calculate roll based on turning direction
+            const rollTarget = crossProduct * 0.5; // Roll proportional to turn sharpness
+
+            // Apply smooth rotation
+            const newRotation = {
+              // Pitch (x-axis rotation)
+              x:
+                enemy.rotation.x +
+                (pitchTarget - enemy.rotation.x) * rotationSmoothness,
+              // Yaw (y-axis rotation)
+              y:
+                enemy.rotation.y +
+                (((targetYaw - enemy.rotation.y + Math.PI) % (Math.PI * 2)) -
+                  Math.PI) *
+                  rotationSmoothness,
+              // Roll (z-axis rotation)
+              z:
+                enemy.rotation.z +
+                (rollTarget - enemy.rotation.z) * rotationSmoothness,
             };
 
             return {
               ...enemy,
               position: newPosition,
-              rotation,
+              rotation: newRotation,
             };
           });
 
@@ -350,10 +406,16 @@ const useStore = create<GameState>(
             const x = playerPosition.x + Math.cos(angle) * spawnDistance;
             const z = playerPosition.z + Math.sin(angle) * spawnDistance;
 
+            // Calculate initial rotation to face player
+            const initialYaw = Math.atan2(
+              -(playerPosition.x - x),
+              -(playerPosition.z - z)
+            );
+
             updatedEnemiesList.push({
               id: uuidv4(),
               position: { x, y: playerPosition.y, z },
-              rotation: { x: 0, y: 0, z: 0 },
+              rotation: { x: 0, y: initialYaw, z: 0 },
               health: 100,
             });
           }
