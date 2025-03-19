@@ -298,7 +298,7 @@ const useStore = create<GameState>(
             // Update enemy rotation to face player
             const rotation = {
               x: enemy.rotation.x,
-              y: Math.atan2(directionToPlayer.x, directionToPlayer.z),
+              y: Math.atan2(-directionToPlayer.x, -directionToPlayer.z),
               z: enemy.rotation.z,
             };
 
