@@ -262,18 +262,6 @@ const Airplane: React.FC<AirplaneProps> = ({
         />
       </mesh>
 
-      {/* Wing details - ribs */}
-      {[-1.5, -0.75, 0, 0.75, 1.5].map((x, i) => (
-        <mesh key={i} position={[x, 0, 0.1]} castShadow>
-          <boxGeometry args={[0.05, 0.15, 1.2]} />
-          <meshStandardMaterial
-            color={mainColor}
-            metalness={0.3}
-            roughness={0.7}
-          />
-        </mesh>
-      ))}
-
       {/* Wing tips curved parts */}
       <mesh position={[2, 0.05, 0.1]} castShadow>
         <boxGeometry args={[0.2, 0.3, 0.8]} />
