@@ -262,25 +262,6 @@ const Airplane: React.FC<AirplaneProps> = ({
         />
       </mesh>
 
-      {/* Wing tips curved parts */}
-      <mesh position={[2, 0.05, 0.1]} castShadow>
-        <boxGeometry args={[0.2, 0.3, 0.8]} />
-        <meshStandardMaterial
-          color={mainColor}
-          metalness={0.4}
-          roughness={0.6}
-        />
-      </mesh>
-
-      <mesh position={[-2, 0.05, 0.1]} castShadow>
-        <boxGeometry args={[0.2, 0.3, 0.8]} />
-        <meshStandardMaterial
-          color={mainColor}
-          metalness={0.4}
-          roughness={0.6}
-        />
-      </mesh>
-
       {/* Rear stabilizers (horizontal) */}
       <mesh position={[0, 0, 1]} castShadow>
         <boxGeometry args={[1.6, 0.1, 0.6]} />
