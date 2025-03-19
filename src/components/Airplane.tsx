@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Vector3, Euler, Group } from "three";
-import { Trail } from "@react-three/drei";
+import { Trail, GradientTexture } from "@react-three/drei";
 import useStore from "../store/store";
 import useKeyControls from "../hooks/useKeyControls";
 
@@ -19,6 +19,7 @@ const Airplane: React.FC<AirplaneProps> = ({
   color = "blue",
 }) => {
   const groupRef = useRef<Group>(null);
+  const propellerRef = useRef<Group>(null);
   const { updateControls } = useKeyControls();
   const { setPlayerPosition, setPlayerRotation, spawnBullet, playerPosition } =
     useStore();
@@ -34,6 +35,11 @@ const Airplane: React.FC<AirplaneProps> = ({
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
+
+    // Rotate propeller
+    if (propellerRef.current) {
+      propellerRef.current.rotation.z += 15 * delta;
+    }
 
     // For enemy planes, update their position and rotation from props
     if (!isPlayer) {
@@ -174,35 +180,223 @@ const Airplane: React.FC<AirplaneProps> = ({
     }
   });
 
+  // Secondary color for details
+  const accentColor = isPlayer ? "#003366" : "#660000";
+  const mainColor = isPlayer ? color : "#cc0000";
+
   return (
     <group ref={groupRef}>
-      {/* Main body */}
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[1, 0.5, 2]} />
-        <meshStandardMaterial color={color} />
+      {/* Fuselage (main body) */}
+      <mesh
+        castShadow
+        receiveShadow
+        position={[0, 0, 0]}
+        rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.4, 0.5, 2.2, 12]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.3}
+          roughness={0.7}
+        />
+      </mesh>
 
-        {/* Add trail effect */}
-        {isPlayer && (
-          <Trail
-            width={1}
-            length={8}
-            color={"#ffffff"}
-            attenuation={(t) => t * t}
+      {/* Nose cone */}
+      <mesh
+        castShadow
+        receiveShadow
+        position={[0, 0, -1.2]}
+        rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.4, 0.8, 12]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.4}
+          roughness={0.6}
+        />
+      </mesh>
+
+      {/* Propeller hub */}
+      <mesh castShadow receiveShadow position={[0, 0, -1.65]}>
+        <cylinderGeometry args={[0.15, 0.15, 0.15, 12]} />
+        <meshStandardMaterial color="#222222" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Propeller */}
+      <group ref={propellerRef} position={[0, 0, -1.72]}>
+        <mesh castShadow receiveShadow rotation={[0, 0, 0]}>
+          <boxGeometry args={[0.1, 1.6, 0.05]} />
+          <meshStandardMaterial
+            color="#222222"
+            metalness={0.5}
+            roughness={0.5}
           />
-        )}
+        </mesh>
+        <mesh castShadow receiveShadow rotation={[0, 0, Math.PI / 2]}>
+          <boxGeometry args={[0.1, 1.6, 0.05]} />
+          <meshStandardMaterial
+            color="#222222"
+            metalness={0.5}
+            roughness={0.5}
+          />
+        </mesh>
+      </group>
+
+      {/* Cockpit */}
+      <mesh castShadow receiveShadow position={[0, 0.3, -0.3]}>
+        <sphereGeometry args={[0.3, 12, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color="#88ccff"
+          metalness={0.8}
+          roughness={0.2}
+          emissive="#003366"
+          emissiveIntensity={0.2}
+        />
       </mesh>
 
-      {/* Wings */}
-      <mesh position={[0, 0, 0]} castShadow>
-        <boxGeometry args={[4, 0.1, 0.7]} />
-        <meshStandardMaterial color={color} />
+      {/* Main Wings */}
+      <mesh position={[0, -0.05, 0.1]} castShadow>
+        <boxGeometry args={[4, 0.1, 1.2]} />
+        <meshStandardMaterial
+          color={accentColor}
+          metalness={0.3}
+          roughness={0.7}
+        />
       </mesh>
 
-      {/* Tail */}
-      <mesh position={[0, 0.3, 1]} castShadow>
-        <boxGeometry args={[1, 0.5, 0.1]} />
-        <meshStandardMaterial color={color} />
+      {/* Wing details - ribs */}
+      {[-1.5, -0.75, 0, 0.75, 1.5].map((x, i) => (
+        <mesh key={i} position={[x, 0, 0.1]} castShadow>
+          <boxGeometry args={[0.05, 0.15, 1.2]} />
+          <meshStandardMaterial
+            color={mainColor}
+            metalness={0.3}
+            roughness={0.7}
+          />
+        </mesh>
+      ))}
+
+      {/* Wing tips curved parts */}
+      <mesh position={[2, 0.05, 0.1]} castShadow>
+        <boxGeometry args={[0.2, 0.3, 0.8]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.4}
+          roughness={0.6}
+        />
       </mesh>
+
+      <mesh position={[-2, 0.05, 0.1]} castShadow>
+        <boxGeometry args={[0.2, 0.3, 0.8]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.4}
+          roughness={0.6}
+        />
+      </mesh>
+
+      {/* Rear stabilizers (horizontal) */}
+      <mesh position={[0, 0, 1]} castShadow>
+        <boxGeometry args={[1.6, 0.1, 0.6]} />
+        <meshStandardMaterial
+          color={accentColor}
+          metalness={0.3}
+          roughness={0.7}
+        />
+      </mesh>
+
+      {/* Vertical stabilizer (tail fin) */}
+      <mesh position={[0, 0.4, 1]} castShadow>
+        <boxGeometry args={[0.1, 0.8, 0.6]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.3}
+          roughness={0.7}
+        />
+      </mesh>
+
+      {/* Rudder */}
+      <mesh position={[0, 0.4, 1.3]} castShadow>
+        <boxGeometry args={[0.1, 0.7, 0.2]} />
+        <meshStandardMaterial
+          color={accentColor}
+          metalness={0.3}
+          roughness={0.7}
+        />
+      </mesh>
+
+      {/* Landing gear struts */}
+      <mesh position={[0.6, -0.5, 0]} castShadow>
+        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
+        <meshStandardMaterial color="#333333" metalness={0.7} roughness={0.3} />
+      </mesh>
+
+      <mesh position={[-0.6, -0.5, 0]} castShadow>
+        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
+        <meshStandardMaterial color="#333333" metalness={0.7} roughness={0.3} />
+      </mesh>
+
+      {/* Landing gear wheels */}
+      <mesh position={[0.6, -0.9, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.15, 0.15, 0.1, 12]} />
+        <meshStandardMaterial color="#111111" metalness={0.4} roughness={0.8} />
+      </mesh>
+
+      <mesh
+        position={[-0.6, -0.9, 0]}
+        rotation={[Math.PI / 2, 0, 0]}
+        castShadow>
+        <cylinderGeometry args={[0.15, 0.15, 0.1, 12]} />
+        <meshStandardMaterial color="#111111" metalness={0.4} roughness={0.8} />
+      </mesh>
+
+      {/* Machine guns */}
+      <mesh position={[1.2, 0, -0.3]} castShadow>
+        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
+        <meshStandardMaterial color="#111111" metalness={0.9} roughness={0.1} />
+      </mesh>
+
+      <mesh position={[-1.2, 0, -0.3]} castShadow>
+        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
+        <meshStandardMaterial color="#111111" metalness={0.9} roughness={0.1} />
+      </mesh>
+
+      {/* Exhaust pipes */}
+      <mesh
+        position={[0.3, -0.2, 0.8]}
+        rotation={[0, 0, Math.PI / 2]}
+        castShadow>
+        <cylinderGeometry args={[0.05, 0.07, 0.3, 8]} />
+        <meshStandardMaterial
+          color="#444444"
+          metalness={0.8}
+          roughness={0.3}
+          emissive="#ff4400"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+
+      <mesh
+        position={[-0.3, -0.2, 0.8]}
+        rotation={[0, 0, -Math.PI / 2]}
+        castShadow>
+        <cylinderGeometry args={[0.05, 0.07, 0.3, 8]} />
+        <meshStandardMaterial
+          color="#444444"
+          metalness={0.8}
+          roughness={0.3}
+          emissive="#ff4400"
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+
+      {/* Add trail effect */}
+      {isPlayer && (
+        <Trail
+          width={1}
+          length={12}
+          color={"#ffffff"}
+          attenuation={(t) => t * t}
+        />
+      )}
     </group>
   );
 };
