@@ -248,7 +248,7 @@ const Airplane: React.FC<AirplaneProps> = ({
         />
       </mesh>
       {/* Main Wings */}
-      <mesh position={[0, -0.05, 0.1]} castShadow>
+      <mesh position={[0, -0.05, -0.5]} castShadow>
         <boxGeometry args={[4, 0.1, 1.2]} />
         <meshStandardMaterial
           color={accentColor}
