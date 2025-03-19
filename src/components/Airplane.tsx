@@ -203,9 +203,9 @@ const Airplane: React.FC<AirplaneProps> = ({
       <mesh
         castShadow
         receiveShadow
-        position={[0, 0, -1.2]}
-        rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.4, 0.8, 12]} />
+        position={[0, 0, -1.6]}
+        rotation={[-Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.5, 0.8, 12]} />
         <meshStandardMaterial
           color={mainColor}
           metalness={0.4}
