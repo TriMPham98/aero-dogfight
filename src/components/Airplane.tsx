@@ -203,7 +203,7 @@ const Airplane: React.FC<AirplaneProps> = ({
       <mesh
         castShadow
         receiveShadow
-        position={[0, 0, -1.6]}
+        position={[0, 0, -1.5]}
         rotation={[-Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.5, 0.8, 12]} />
         <meshStandardMaterial
