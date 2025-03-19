@@ -227,7 +227,19 @@ const Game: React.FC = () => {
       {bullets.map((bullet) => (
         <mesh
           key={bullet.id}
-          position={[bullet.position.x, bullet.position.y, bullet.position.z]}>
+          position={[bullet.position.x, bullet.position.y, bullet.position.z]}
+          rotation={[
+            // Calculate rotation from velocity vector
+            Math.atan2(
+              bullet.velocity.y,
+              Math.sqrt(
+                bullet.velocity.x * bullet.velocity.x +
+                  bullet.velocity.z * bullet.velocity.z
+              )
+            ),
+            Math.atan2(bullet.velocity.x, bullet.velocity.z),
+            0,
+          ]}>
           <boxGeometry args={[0.2, 0.2, 0.6]} />
           <meshStandardMaterial color="yellow" emissive="orange" />
         </mesh>
