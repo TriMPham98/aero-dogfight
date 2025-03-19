@@ -317,17 +317,6 @@ const Airplane: React.FC<AirplaneProps> = ({
         <meshStandardMaterial color="#111111" metalness={0.4} roughness={0.8} />
       </mesh>
 
-      {/* Machine guns */}
-      <mesh position={[1.2, 0, -0.3]} castShadow>
-        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
-        <meshStandardMaterial color="#111111" metalness={0.9} roughness={0.1} />
-      </mesh>
-
-      <mesh position={[-1.2, 0, -0.3]} castShadow>
-        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
-        <meshStandardMaterial color="#111111" metalness={0.9} roughness={0.1} />
-      </mesh>
-
       {/* Exhaust pipes */}
       <mesh
         position={[0.3, -0.2, 0.8]}
