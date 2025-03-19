@@ -199,7 +199,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           roughness={0.7}
         />
       </mesh>
-
       {/* Nose cone */}
       <mesh
         castShadow
@@ -213,13 +212,11 @@ const Airplane: React.FC<AirplaneProps> = ({
           roughness={0.6}
         />
       </mesh>
-
       {/* Propeller hub */}
       <mesh castShadow receiveShadow position={[0, 0, -1.65]}>
         <cylinderGeometry args={[0.15, 0.15, 0.15, 12]} />
         <meshStandardMaterial color="#222222" metalness={0.8} roughness={0.2} />
       </mesh>
-
       {/* Propeller */}
       <group ref={propellerRef} position={[0, 0, -1.72]}>
         <mesh castShadow receiveShadow rotation={[0, 0, 0]}>
@@ -239,7 +236,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           />
         </mesh>
       </group>
-
       {/* Cockpit */}
       <mesh castShadow receiveShadow position={[0, 0.3, -0.3]}>
         <sphereGeometry args={[0.3, 12, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
@@ -251,7 +247,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           emissiveIntensity={0.2}
         />
       </mesh>
-
       {/* Main Wings */}
       <mesh position={[0, -0.05, 0.1]} castShadow>
         <boxGeometry args={[4, 0.1, 1.2]} />
@@ -261,7 +256,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           roughness={0.7}
         />
       </mesh>
-
       {/* Rear stabilizers (horizontal) */}
       <mesh position={[0, 0, 1]} castShadow>
         <boxGeometry args={[1.6, 0.1, 0.6]} />
@@ -271,7 +265,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           roughness={0.7}
         />
       </mesh>
-
       {/* Vertical stabilizer (tail fin) */}
       <mesh position={[0, 0.4, 1]} castShadow>
         <boxGeometry args={[0.1, 0.8, 0.6]} />
@@ -281,7 +274,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           roughness={0.7}
         />
       </mesh>
-
       {/* Rudder */}
       <mesh position={[0, 0.4, 1.3]} castShadow>
         <boxGeometry args={[0.1, 0.7, 0.2]} />
@@ -291,61 +283,6 @@ const Airplane: React.FC<AirplaneProps> = ({
           roughness={0.7}
         />
       </mesh>
-
-      {/* Landing gear struts */}
-      <mesh position={[0.6, -0.5, 0]} castShadow>
-        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
-        <meshStandardMaterial color="#333333" metalness={0.7} roughness={0.3} />
-      </mesh>
-
-      <mesh position={[-0.6, -0.5, 0]} castShadow>
-        <cylinderGeometry args={[0.05, 0.05, 0.8, 8]} />
-        <meshStandardMaterial color="#333333" metalness={0.7} roughness={0.3} />
-      </mesh>
-
-      {/* Landing gear wheels */}
-      <mesh position={[0.6, -0.9, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-        <cylinderGeometry args={[0.15, 0.15, 0.1, 12]} />
-        <meshStandardMaterial color="#111111" metalness={0.4} roughness={0.8} />
-      </mesh>
-
-      <mesh
-        position={[-0.6, -0.9, 0]}
-        rotation={[Math.PI / 2, 0, 0]}
-        castShadow>
-        <cylinderGeometry args={[0.15, 0.15, 0.1, 12]} />
-        <meshStandardMaterial color="#111111" metalness={0.4} roughness={0.8} />
-      </mesh>
-
-      {/* Exhaust pipes */}
-      <mesh
-        position={[0.3, -0.2, 0.8]}
-        rotation={[0, 0, Math.PI / 2]}
-        castShadow>
-        <cylinderGeometry args={[0.05, 0.07, 0.3, 8]} />
-        <meshStandardMaterial
-          color="#444444"
-          metalness={0.8}
-          roughness={0.3}
-          emissive="#ff4400"
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
-      <mesh
-        position={[-0.3, -0.2, 0.8]}
-        rotation={[0, 0, -Math.PI / 2]}
-        castShadow>
-        <cylinderGeometry args={[0.05, 0.07, 0.3, 8]} />
-        <meshStandardMaterial
-          color="#444444"
-          metalness={0.8}
-          roughness={0.3}
-          emissive="#ff4400"
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-
       {/* Add trail effect */}
       {isPlayer && (
         <Trail
